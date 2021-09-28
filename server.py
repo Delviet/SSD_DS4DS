@@ -1,20 +1,19 @@
-import socket
+import rpyc
 
-counter = 0
+class ComputingService(rpyc.Service):
+    
+    def on_connect(self, conn):
+        pass
+    
+    def on_disconnect(self, conn):
+        pass
+    
+    def exposed_perform_multiplication(self, array, weight = 10):
+        new_array = [i * weight for i in array]
+        print(new_array)
+        return new_array
 
-s = socket.socket()
-ip = '127.0.0.1'
-port = 1234
-
-print('Server is up!')
-s.bind((ip, port))
-s.listen(1)
-
-
-while True:
-    conn, addr = s.accept()
-    print(f"Received connection from {addr[0]}:{addr[1]}")
-
-    conn.send(f'Your request is №{counter}'.encode())
-    counter += 1
-    conn.close()
+if __name__ == "__main__":
+    from rpyc.utils.server import ThreadedServer
+    t = ThreadedServer(ComputingService, port=18861)
+    t.start()
