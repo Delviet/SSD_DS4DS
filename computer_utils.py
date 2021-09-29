@@ -1,6 +1,26 @@
 from abc import ABC, abstractmethod
 from multiprocessing import Queue
+from time import sleep
 import numpy as np
+
+class Overseer:
+    
+    def __init__(self, connection):
+        self.c = connection
+    
+    def put(self, queue, weight, res_dict, shared_status):
+        while True:
+            if queue.empty():
+                sleep(0.05)
+                continue
+            idx, data_frac = queue.get()
+            ans = self.c.root.process(data_frac, weight)
+            print(ans)
+            res_dict[idx] = ans
+            shared_status[idx] = 1
+            if all(shared_status):
+                break
+        return res_dict            
 
 class Splitter(ABC):
 
@@ -22,6 +42,7 @@ class SimpleSplitter(Splitter):
         for i in range(samples):
             queue.put((i, data[i]))    
         self.is_working = False
+        return samples
         
     def working(self):
         return self.is_working
