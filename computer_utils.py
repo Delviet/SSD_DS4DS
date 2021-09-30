@@ -5,6 +5,12 @@ import numpy as np
 
 class Overseer:
     
+    """
+    This class uses given connection
+    to implement computations with the
+    data given in the queue
+    """
+    
     def __init__(self, connection):
         self.c = connection
     
@@ -15,7 +21,6 @@ class Overseer:
                 continue
             idx, data_frac = queue.get()
             ans = self.c.root.process(data_frac, weight)
-            print(ans)
             res_dict[idx] = ans
             shared_status[idx] = 1
             if all(shared_status):

@@ -1,5 +1,6 @@
 import rpyc
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
+import argparse
 
 class ProcessingService(rpyc.Service):
     
@@ -16,5 +17,9 @@ class ProcessingService(rpyc.Service):
 
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
-    t = ThreadedServer(ProcessingService, port=18861)
+    parser = argparse.ArgumentParser(description='Port parser')
+    parser.add_argument('--port', type=int, default = 18861, 
+                        help='server port', required = False)
+    args = parser.parse_args()
+    t = ThreadedServer(ProcessingService, port=args.port)
     t.start()
