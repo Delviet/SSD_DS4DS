@@ -1,3 +1,4 @@
+from computations import *
 import rpyc
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 import argparse
@@ -10,8 +11,19 @@ class ProcessingService(rpyc.Service):
     def on_disconnect(self, conn):
         pass
     
+    def exposed_set_operation(self, name):
+        if name == 'DotProduct':
+            self.op = DotProduct
+        elif name == 'Addition':
+            self.op = Addition
+        elif name == 'ReLu':
+            self.op = ReLu
+        elif name == 'SoftMax':
+            self.op = SoftMax
+    
     def exposed_process(self, data, weight = 10):
-        new_array = [i * weight for i in data]
+        dp = self.op(weight)
+        new_array = dp.operate(data)
         print(new_array)
         return new_array
 
