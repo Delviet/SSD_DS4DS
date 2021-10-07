@@ -10,9 +10,9 @@ At the current stage, we propose naive distributed computing for the single full
 
 ## Further steps
 
-- [] Use ONNX for the Computer-Processor communication  
-- [] Implement reliable distributed computation  
-- [] Change the architecture, adding the Resource Manager  
+- [ ] Use ONNX for the Computer-Processor communication  
+- [ ] Implement reliable distributed computation  
+- [ ] Change the architecture, adding the Resource Manager  
 
 ## Authors 
 
