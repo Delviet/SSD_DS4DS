@@ -11,6 +11,7 @@ class ProcessingService(rpyc.Service):
     def on_disconnect(self, conn):
         pass
     
+    # changing the operation
     def exposed_set_operation(self, name):
         if name == 'DotProduct':
             self.op = DotProduct
@@ -29,9 +30,11 @@ class ProcessingService(rpyc.Service):
 
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
+    # parsing port of the server
     parser = argparse.ArgumentParser(description='Port parser')
     parser.add_argument('--port', type=int, default = 18861, 
                         help='server port', required = False)
     args = parser.parse_args()
+    
     t = ThreadedServer(ProcessingService, port=args.port)
     t.start()
