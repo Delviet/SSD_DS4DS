@@ -17,13 +17,14 @@ class Overseer:
     
     def put(self, queue, res_dict, shared_status):
         while True:
-            if all(shared_status):
+            if all(shared_status): # check all tasks completed
                 break 
-            if queue.empty():
+            if queue.empty(): # wait for new tasks
                 sleep(0.05)
                 continue
             idx, data_frac, weight = queue.get()
             ans = self.c.root.process(data_frac, weight)
+            # saving result and changing status
             res_dict[idx] = ans
             shared_status[idx] = 1         
 
@@ -33,7 +34,7 @@ class Splitter(ABC):
         self.is_working = False
         
     @abstractmethod
-    def split(self, data, queue):
+    def split(self, data, weight, queue, mode):
         pass
         
 class SimpleSplitter(Splitter):
@@ -43,23 +44,24 @@ class SimpleSplitter(Splitter):
         
     def split(self, data, weight, queue, mode = 'weight'):
         self.is_working = True
+        # split across the data, share weight
         if mode == 'data':
             samples = data.shape[0]
             for i in range(samples):
-                queue.put((i, data[i], weight))    
+                queue.put((i, data[i], weight))
+        # split across the weight, share data
         elif mode == 'weight':
             samples = weight.shape[0]
             for i in range(samples):
                 queue.put((i, data, weight[i]))
+        # split across both the weight and data 
+        # (separate parameter for each data unit)
         elif mode == 'both':
             samples = weight.shape[0]
             for i in range(samples):
                 queue.put((i, data[i], weight[i]))
         self.is_working = False 
         return samples
-        
-    def working(self):
-        return self.is_working
             
 class Merger(ABC):
     
@@ -67,7 +69,7 @@ class Merger(ABC):
         pass
     
     @abstractmethod
-    def merge(self, data, axis = 0):
+    def merge(self, data, axis):
         pass
     
 class SimpleMerger(Merger):
@@ -81,10 +83,10 @@ class SimpleMerger(Merger):
         returns stacks data over specified axis
         based on the idx order in the dict
         """
+        # recovering correct data order
         sorted_items = sorted(data.items(), key = lambda x: x[0])
         sorted_vals = [val for (key, val) in sorted_items]
         if not axis is None:
-            print('Stack!')
             return np.stack(sorted_vals, axis = axis)
         else:
             return np.array(sorted_vals)
